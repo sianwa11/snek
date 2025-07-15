@@ -1,4 +1,6 @@
 import pygame
+from snek import Snek
+from food import Food
 
 pygame.init()
 
@@ -8,20 +10,14 @@ GRID_SIZE = 50
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-snek_x = 50
-snek_y = 350
-
-direction_x = 1  
-direction_y = 0  
-
-# Timer for automatic movement
-move_timer = 0
-move_delay = 300  # milliseconds between moves (adjust for speed)
+snek = Snek(50, 350, GRID_SIZE)
+food = Food(300, 300, GRID_SIZE)
 
 clock = pygame.time.Clock()
 dt = 0
 
 running = True
+times = 0
 
 while running:
   for event in pygame.event.get():
@@ -31,24 +27,22 @@ while running:
     # Keys now change DIRECTION, not position
     if event.type == pygame.KEYDOWN:
       if event.key == pygame.K_LEFT:
-        direction_x = -1
-        direction_y = 0
+        snek.change_direction(-1, 0)
       if event.key == pygame.K_RIGHT:
-        direction_x = 1
-        direction_y = 0
+        snek.change_direction(1, 0)
       if event.key == pygame.K_UP:
-        direction_x = 0
-        direction_y = -1
+        snek.change_direction(0, -1)
       if event.key == pygame.K_DOWN:
-        direction_x = 0
-        direction_y = 1
+        snek.change_direction(0, 1)
 
-  # Automatic movement based on timer
-  move_timer += dt * 1000  # Convert dt to milliseconds
-  if move_timer >= move_delay:
-    snek_x += direction_x * GRID_SIZE
-    snek_y += direction_y * GRID_SIZE
-    move_timer = 0  # Reset timer
+
+  # Update the snake
+  snek.update(dt)
+
+  if snek.collide(food):
+    times += 1
+    print(f"Snek ate the food! Times eaten: {times}")
+
 
   screen.fill("black")
 
@@ -59,7 +53,9 @@ while running:
       pygame.draw.rect(screen, "white", pygame.Rect(x, y, 50, 50), 1)
 
   # Draw the snake
-  pygame.draw.rect(screen, "red", pygame.Rect(snek_x, snek_y, GRID_SIZE, GRID_SIZE))
+  snek.draw(screen)
+  # Draw the food
+  food.draw(screen)
 
   pygame.display.flip()
   dt = clock.tick(60) / 1000
