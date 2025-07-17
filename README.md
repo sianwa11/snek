@@ -1,6 +1,6 @@
 **About Snek**
 
-A clone of the popular Snake game
+A clone of the popular Snake game, dubbed "snek"
 
 **How to clone and run**
 
